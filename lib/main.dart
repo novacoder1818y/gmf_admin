@@ -1,10 +1,16 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gmfc_admin/firebase_options.dart';
 import 'app/controllers/theme_controller.dart';
 import 'app/routes/admin_pages.dart';
 import 'app/theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+);
   // Initialize and register the ThemeController for app-wide use.
   Get.put(ThemeController());
   runApp(const AdminPanelApp());
