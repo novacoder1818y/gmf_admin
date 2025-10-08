@@ -1,11 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:gmfc_admin/app/modules/auth/signup.dart';
 import '../../theme/app_theme.dart';
 import 'auth_controller.dart';
 import 'login.dart';
+import 'signup.dart';
 
 class AuthAdminView extends StatefulWidget {
   const AuthAdminView({super.key});
@@ -58,7 +57,6 @@ class _AuthViewState extends State<AuthAdminView> with TickerProviderStateMixin 
     return Scaffold(
       body: Stack(
         children: [
-          // Animated "Aurora" Background
           Container(color: AppTheme.primaryColor),
           AnimatedBuilder(
             animation: Listenable.merge([_controller1, _controller2]),
@@ -77,7 +75,6 @@ class _AuthViewState extends State<AuthAdminView> with TickerProviderStateMixin 
               );
             },
           ),
-          // UI Content
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
@@ -88,7 +85,6 @@ class _AuthViewState extends State<AuthAdminView> with TickerProviderStateMixin 
                     children: [
                       const Icon(Icons.shield_outlined, size: 60, color: Colors.white),
                       const SizedBox(height: 50),
-                      // Animated Switcher for Login/Signup forms
                       Obx(
                             () => AnimatedSwitcher(
                           duration: const Duration(milliseconds: 400),
@@ -101,7 +97,6 @@ class _AuthViewState extends State<AuthAdminView> with TickerProviderStateMixin 
                         ),
                       ),
                       const SizedBox(height: 30),
-                      // Toggle Button
                       Obx(
                             () => TextButton(
                           onPressed: authController.toggleForm,
@@ -138,4 +133,3 @@ class _AuthViewState extends State<AuthAdminView> with TickerProviderStateMixin 
     );
   }
 }
-

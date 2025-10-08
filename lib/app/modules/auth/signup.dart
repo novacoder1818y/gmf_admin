@@ -1,12 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
-
-import '../../routes/admin_routes.dart';
 import '../../widgets/neon_button.dart';
 import 'auth_controller.dart';
 
@@ -27,16 +21,19 @@ class SignupWidget extends GetView<AuthController> {
         ),
         const SizedBox(height: 40),
         TextFormField(
+          controller: controller.fullNameController, // Connect controller
           decoration: const InputDecoration(labelText: 'Full Name', prefixIcon: Icon(Icons.person_outline)),
         ),
         const SizedBox(height: 20),
         TextFormField(
+          controller: controller.emailController, // Connect controller
           decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined)),
           keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: 20),
         Obx(
               () => TextFormField(
+            controller: controller.passwordController, // Connect controller
             obscureText: !controller.isPasswordVisible.value,
             decoration: InputDecoration(
               labelText: 'Password',
@@ -49,11 +46,13 @@ class SignupWidget extends GetView<AuthController> {
           ),
         ),
         const SizedBox(height: 40),
-        NeonButton(
-          text: 'Create Account',
-          onTap: () => Get.offAllNamed(Routes.MAIN),
+        Obx(() => controller.isLoading.value
+            ? const CircularProgressIndicator()
+            : NeonButton(
+          text: 'Create Account & Verify',
+          onTap: controller.signUpAdminWithEmail, // Call the sign-up method
           gradientColors: const [Colors.purpleAccent, Colors.pinkAccent],
-        ),
+        )),
       ],
     ).animate().fadeIn(duration: 300.ms);
   }

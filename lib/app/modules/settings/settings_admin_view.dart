@@ -1,15 +1,19 @@
+// settings_admin_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:gmfc_admin/app/modules/settings/setting_admin_controller.dart';
 import '../../controllers/theme_controller.dart';
-import '../../routes/admin_routes.dart';
 
 class SettingsAdminView extends StatelessWidget {
   const SettingsAdminView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Find the globally available ThemeController
     final ThemeController themeController = Get.find();
+    final SettingsAdminController controller = Get.put(SettingsAdminController());
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -31,7 +35,8 @@ class SettingsAdminView extends StatelessWidget {
             leading: const Icon(Icons.logout, color: Colors.redAccent),
             title: const Text('Log Out'),
             onTap: () {
-              Get.offAllNamed(Routes.AUTH);
+              // Call the confirmation method from the controller
+              controller.confirmLogout();
             },
           ).animate().fadeIn(delay: 200.ms).slideX(),
         ],
