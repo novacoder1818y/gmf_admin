@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../data/models/challenge_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/neon_button.dart';
 
@@ -12,6 +13,9 @@ class AddChallengeView extends StatefulWidget {
 }
 
 class _AddChallengeViewState extends State<AddChallengeView> {
+  final ChallengeModel? existingChallenge = Get.arguments;
+  late bool isEditMode;
+
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -22,47 +26,68 @@ class _AddChallengeViewState extends State<AddChallengeView> {
 
   String? _selectedDifficulty = 'Easy';
   String? _selectedCategory = 'MCQ';
-  String? _correctAnswer; // This will hold the correct option text
+  String? _correctAnswer;
+
+  @override
+  void initState() {
+    super.initState();
+    isEditMode = existingChallenge != null;
+    if (isEditMode) {
+      // Pre-populate the form fields with existing data.
+      // This now correctly accesses the fields from the new ChallengeModel.
+      _titleController.text = existingChallenge!.title;
+      _descriptionController.text = existingChallenge!.description;
+      _pointsController.text = existingChallenge!.points.toString();
+      _selectedDifficulty = existingChallenge!.difficulty;
+      _selectedCategory = existingChallenge!.category;
+      _correctAnswer = existingChallenge!.correctAnswer;
+      if (existingChallenge!.options != null && existingChallenge!.options!.length >= 3) {
+        _option1Controller.text = existingChallenge!.options![0];
+        _option2Controller.text = existingChallenge!.options![1];
+        _option3Controller.text = existingChallenge!.options![2];
+      }
+    }
+  }
 
   void _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      if (_correctAnswer == null) {
-        Get.snackbar('Error', 'Please select a correct answer.', backgroundColor: Colors.red);
-        return;
-      }
+    if (!_formKey.currentState!.validate()) return;
+    if (_correctAnswer == null || _correctAnswer!.isEmpty) {
+      Get.snackbar('Error', 'Please select a correct answer.', backgroundColor: Colors.red);
+      return;
+    }
 
-      Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
-      try {
-        await FirebaseFirestore.instance.collection('challenges').add({
-          'title': _titleController.text,
-          'description': _descriptionController.text,
-          'difficulty': _selectedDifficulty,
-          'category': _selectedCategory,
-          'points': int.tryParse(_pointsController.text) ?? 0,
-          'questionType': 'multiple_choice',
-          'options': [
-            _option1Controller.text,
-            _option2Controller.text,
-            _option3Controller.text,
-          ],
-          'correctAnswer': _correctAnswer,
-        });
+    Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
 
-        Get.back(); // Close dialog
-        Get.back(); // Close form
-        Get.snackbar('Success!', 'New challenge has been created.', backgroundColor: Colors.green);
-      } catch (e) {
-        Get.back();
-        Get.snackbar('Error', 'Failed to create challenge: $e');
-        print(e);
+    final Map<String, dynamic> data = {
+      'title': _titleController.text,
+      'description': _descriptionController.text,
+      'difficulty': _selectedDifficulty,
+      'category': _selectedCategory,
+      'points': int.tryParse(_pointsController.text) ?? 0,
+      'questionType': 'multiple_choice',
+      'options': [_option1Controller.text, _option2Controller.text, _option3Controller.text],
+      'correctAnswer': _correctAnswer,
+    };
+
+    try {
+      if (isEditMode) {
+        await FirebaseFirestore.instance.collection('challenges').doc(existingChallenge!.id).update(data);
+      } else {
+        await FirebaseFirestore.instance.collection('challenges').add(data);
       }
+      Get.back(); // Close dialog
+      Get.back(); // Close form
+      Get.snackbar('Success', isEditMode ? 'Challenge updated.' : 'New challenge created.');
+    } catch (e) {
+      Get.back();
+      Get.snackbar('Error', 'Operation failed: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create New MCQ Challenge')),
+      appBar: AppBar(title: Text(isEditMode ? 'Edit Challenge' : 'Create New Challenge')),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -82,7 +107,7 @@ class _AddChallengeViewState extends State<AddChallengeView> {
             _buildOptionField(_option2Controller, 'Option 2'),
             _buildOptionField(_option3Controller, 'Option 3'),
             const SizedBox(height: 30),
-            NeonButton(text: 'Create Challenge', onTap: _submitForm, gradientColors: const [AppTheme.accentColor, AppTheme.tertiaryColor]),
+            NeonButton(text: isEditMode ? 'Update Challenge' : 'Create Challenge', onTap: _submitForm, gradientColors: [AppTheme.accentColor, AppTheme.primaryColor]),
           ],
         ),
       ),
@@ -94,26 +119,17 @@ class _AddChallengeViewState extends State<AddChallengeView> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          Expanded(
-            child: _buildTextFormField(controller: controller, label: label, icon: Icons.quiz_outlined),
-          ),
+          Expanded(child: _buildTextFormField(controller: controller, label: label, icon: Icons.quiz_outlined)),
           Radio<String>(
             value: controller.text,
             groupValue: _correctAnswer,
-            onChanged: (value) {
-              // We set state to rebuild the UI and show which radio button is selected
-              setState(() {
-                // We use the text from the controller as the value to ensure it's always in sync
-                _correctAnswer = controller.text;
-              });
-            },
+            onChanged: (value) => setState(() => _correctAnswer = controller.text),
           ),
         ],
       ),
     );
   }
 
-  // Other helper methods (_buildTextFormField, _buildDropdown) remain the same
   TextFormField _buildTextFormField({required TextEditingController controller, required String label, required IconData icon, int maxLines = 1, TextInputType? keyboardType}) {
     return TextFormField(controller: controller, maxLines: maxLines, keyboardType: keyboardType, decoration: InputDecoration(labelText: label, prefixIcon: Icon(icon), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), filled: true), validator: (v) => v == null || v.isEmpty ? 'Cannot be empty' : null);
   }

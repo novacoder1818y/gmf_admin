@@ -5,6 +5,9 @@ import '../../data/dummy_data.dart';
 import '../../data/models/event_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/neon_button.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddEventView extends StatefulWidget {
   const AddEventView({super.key});
@@ -14,6 +17,8 @@ class AddEventView extends StatefulWidget {
 }
 
 class _AddEventViewState extends State<AddEventView> {
+  final _challengeIdsController = TextEditingController();
+  final _durationController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -41,6 +46,14 @@ class _AddEventViewState extends State<AddEventView> {
   }
 
   void _submitForm() {
+    final List<String> challengeIds = _challengeIdsController.text.split(',').map((e) => e.trim()).toList();
+    final Map<String, dynamic> data = {
+      'title': _titleController.text,
+      'description': _descriptionController.text,
+      'startDate': _startDate,
+      'durationInMinutes': int.tryParse(_durationController.text) ?? 5,
+      'challengeIds': challengeIds,
+    };
     if (_formKey.currentState!.validate()) {
       final newEvent = EventModel(id: DateTime.now().millisecondsSinceEpoch.toString(), title: _titleController.text, description: _descriptionController.text, startDate: _startDate, endDate: _endDate, isActive: true, participants: 0);
       DummyData.events.insert(0, newEvent);
@@ -66,6 +79,16 @@ class _AddEventViewState extends State<AddEventView> {
             const SizedBox(height: 16),
             _buildDatePicker(context: context, label: 'End Date', date: _endDate, onTap: () => _selectDate(context, false)),
             const SizedBox(height: 30),
+            TextFormField(
+              controller: _durationController,
+              decoration: const InputDecoration(labelText: 'Duration in Minutes'),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _challengeIdsController,
+              decoration: const InputDecoration(labelText: 'Challenge IDs (comma-separated)'),
+            ),
             NeonButton(text: 'Create Event', onTap: _submitForm, gradientColors: const [AppTheme.accentColor, AppTheme.tertiaryColor]),
           ],
         ),
