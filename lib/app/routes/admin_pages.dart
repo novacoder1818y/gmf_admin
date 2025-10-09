@@ -1,10 +1,8 @@
 import 'package:get/get.dart';
-
 // UPDATED IMPORT: Make sure it points to your single auth module file.
 import '../modules/auth/auth_admin_view.dart';
 import '../modules/auth/auth_binding.dart';
 import '../modules/challenges/add_challenge_view.dart';
-import '../modules/challenges/challenge_detail_admin_view.dart';
 import '../modules/challenges/challenges_admin_view.dart';
 import '../modules/dashboard/dashboard_admin_view.dart';
 import '../modules/events/add_event_view.dart';
@@ -29,30 +27,15 @@ class AdminPages {
       binding: AuthBinding(),
     ),
 
-    GetPage(
-      name: Routes.MAIN,
-      page: () => const AdminMainView(),
-      binding: AdminMainBinding(),
-    ),
+    GetPage(name: Routes.MAIN, page: () => const AdminMainView(), binding: AdminMainBinding()),
     GetPage(name: Routes.DASHBOARD, page: () => const DashboardAdminView()),
-    GetPage(name: Routes.CHALLENGES, page: () => const ChallengesAdminView()),
-    GetPage(
-      name: Routes.CHALLENGE_DETAIL, // <-- ADD THIS NEW GetPage
-      page: () => const ChallengeDetailAdminView(),
-    ),
-    GetPage(
-      name: Routes.ADD_CHALLENGE,
-      page: () => const AddChallengeView(),
-      transition: Transition.downToUp,
-    ),
+    GetPage(name: Routes.CHALLENGES, page: () => const ChallengesAdminView(), ),
+    GetPage(name: Routes.ADD_CHALLENGE, page: () => const AddChallengeView(), transition: Transition.downToUp),
     GetPage(name: Routes.EVENTS, page: () => const EventsAdminView()),
-    GetPage(
-      name: Routes.ADD_EVENT,
-      page: () => const AddEventView(),
-      transition: Transition.downToUp,
-    ),
+    GetPage(name: Routes.ADD_EVENT, page: () => const AddEventView(), transition: Transition.downToUp),
     GetPage(name: Routes.USERS, page: () => const UsersAdminView()),
     GetPage(name: Routes.USER_DETAIL, page: () => const UserDetailView()),
     GetPage(name: Routes.SETTINGS, page: () => const SettingsAdminView()),
   ];
 }
+

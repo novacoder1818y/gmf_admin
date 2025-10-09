@@ -1,11 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
-
-import '../../routes/admin_routes.dart';
 import '../../widgets/neon_button.dart';
 import 'auth_controller.dart';
 
@@ -26,12 +21,14 @@ class LoginWidget extends GetView<AuthController> {
         ),
         const SizedBox(height: 40),
         TextFormField(
+          controller: controller.emailController, // Connect controller
           decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined)),
           keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: 20),
         Obx(
               () => TextFormField(
+            controller: controller.passwordController, // Connect controller
             obscureText: !controller.isPasswordVisible.value,
             decoration: InputDecoration(
               labelText: 'Password',
@@ -44,11 +41,13 @@ class LoginWidget extends GetView<AuthController> {
           ),
         ),
         const SizedBox(height: 40),
-        NeonButton(
+        Obx(() => controller.isLoading.value
+            ? const CircularProgressIndicator()
+            : NeonButton(
           text: 'Login',
-          onTap: () => Get.offAllNamed(Routes.MAIN),
+          onTap: controller.signInAdminWithEmail, // Call the sign-in method
           gradientColors: const [Colors.cyan, Colors.blueAccent],
-        ),
+        )),
       ],
     ).animate().fadeIn(duration: 300.ms);
   }
