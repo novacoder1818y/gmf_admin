@@ -5,6 +5,7 @@ import 'package:gmfc_admin/app/modules/dashboard/dashboard_binding.dart';
 import 'package:gmfc_admin/app/modules/users/user_admin_binding.dart';
 import '../modules/active_users/active_users_binding.dart';
 import '../modules/active_users/active_users_view.dart';
+import '../modules/admin_code_feed/add_feed_post_view.dart';
 import '../modules/admin_code_feed/feed_admin_view.dart';
 import '../modules/admin_code_feed/feed_binding.dart';
 import '../modules/auth/auth_admin_view.dart';
@@ -44,6 +45,11 @@ class AdminPages {
       name: Routes.FEED,
       page: () => const FeedAdminView(),
       binding: FeedAdminBinding(),
+    ),
+    GetPage(
+      name: Routes.ADD_FEED_POST,
+      page: () => const AddFeedPostView(),
+      transition: Transition.downToUp,
     ),
     GetPage(
       name: Routes.DASHBOARD,

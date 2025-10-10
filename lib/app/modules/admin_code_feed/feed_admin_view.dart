@@ -13,13 +13,16 @@ class FeedAdminView extends GetView<FeedAdminController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: const Text('Code Feed Management')),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('codeFeed').orderBy('createdAt', descending: true).snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
           final posts = snapshot.data!.docs.map((doc) => FeedPostModel.fromFirestore(doc)).toList();
+
+          if (posts.isEmpty) {
+            return const Center(child: Text('No posts found. Create one!'));
+          }
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -29,8 +32,9 @@ class FeedAdminView extends GetView<FeedAdminController> {
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
+                  leading: const Icon(Icons.article_outlined),
                   title: Text(post.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('By ${post.author} on ${DateFormat.yMMMd().format(post.createdAt.toDate())}'),
+                  subtitle: Text('By ${post.author} on ${post.createdAt != null ? DateFormat.yMMMd().format(post.createdAt!.toDate()) : 'No date'}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -45,7 +49,7 @@ class FeedAdminView extends GetView<FeedAdminController> {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.toNamed(Routes.ADD_FEED_POST),
+        onPressed: () => Get.toNamed(Routes.ADD_FEED_POST), // This line is correct
         label: const Text('New Post'),
         icon: const Icon(Icons.add),
       ),
