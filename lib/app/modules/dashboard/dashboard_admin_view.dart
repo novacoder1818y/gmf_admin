@@ -30,10 +30,10 @@ class DashboardAdminView extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 final statCards = [
-                  StatCard(title: 'Total Users', value: '1,420', icon: Icons.group, color: Colors.blue, onTap: () => mainController.changePage(3)),
-                  StatCard(title: 'Challenges', value: '85', icon: Icons.gamepad, color: Colors.green, onTap: () => mainController.changePage(1)),
+                  StatCard(title: 'Total Users', value: '3', icon: Icons.group, color: Colors.blue, onTap: () => mainController.changePage(3)),
+                  StatCard(title: 'Challenges', value: '2', icon: Icons.gamepad, color: Colors.green, onTap: () => mainController.changePage(1)),
                   StatCard(title: 'Active Events', value: '3', icon: Icons.event, color: Colors.purple, onTap: () => mainController.changePage(2)),
-                  StatCard(title: 'Daily Active', value: '215', icon: Icons.local_fire_department, color: Colors.orange, onTap: () {}),
+                  StatCard(title: 'Daily Active', value: '2', icon: Icons.local_fire_department, color: Colors.orange, onTap: () {}),
                 ];
                 return statCards[index]
                     .animate()
