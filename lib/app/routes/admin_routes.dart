@@ -10,4 +10,9 @@ abstract class Routes {
   static const USERS = '/users';
   static const USER_DETAIL = '/users/detail';
   static const SETTINGS = '/settings';
+  static const MANAGE_PRACTICE='/manage-practice';
+  static const MANAGE_PRACTICE_PROBLEMS = '/manage-practice/problems';
+  static const ACTIVE_USERS = '/active-users';
+  static const FEED = '/feed';
+  static const ADD_FEED_POST = '/feed/add';
 }

@@ -5,7 +5,7 @@ import 'models/user_model.dart';
 class DummyData {
   static List<UserModel> users = [
     UserModel(id: '1', name: 'CodeNinja', email: 'ninja@code.com', xp: 15200, streak: 12, joinedDate: DateTime(2023, 5, 10)),
-    UserModel(id: '2', name: 'AlgoQueen', email: 'queen@algo.com', xp: 14800, streak: 25, joinedDate: DateTime(2023, 3, 22), isSuspended: true),
+    UserModel(id: '2', name: 'AlgoQueen', email: 'queen@algo.com', xp: 14800, streak: 25, joinedDate: DateTime(2023, 3, 22),),
     UserModel(id: '3', name: 'ByteMaster', email: 'master@byte.com', xp: 12500, streak: 5, joinedDate: DateTime(2023, 6, 1)),
     UserModel(id: '4', name: 'ScriptKid', email: 'kid@script.com', xp: 8500, streak: 2, joinedDate: DateTime(2023, 7, 15)),
   ];

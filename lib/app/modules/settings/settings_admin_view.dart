@@ -16,7 +16,7 @@ class SettingsAdminView extends StatelessWidget {
     final SettingsAdminController controller = Get.put(SettingsAdminController());
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      // appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

@@ -12,7 +12,7 @@ class EventsAdminView extends GetView<EventsAdminController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Event Management')),
+    //  appBar: AppBar(title: const Text('Event Management')),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('events').orderBy('startDate', descending: true).snapshots(),
         builder: (context, snapshot) {

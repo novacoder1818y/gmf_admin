@@ -1,6 +1,9 @@
+// lib/modules/users/user_detail_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:gmfc_admin/app/modules/users/user_admin_controller.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/user_model.dart';
 import '../../widgets/neon_button.dart';
@@ -10,74 +13,70 @@ class UserDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final UserModel user = Get.arguments;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final UsersAdminController usersController = Get.find();
+    // Get the initial (static) user data from arguments
+    final UserModel initialUser = Get.arguments;
+
+    // THIS IS THE FIX: Find the REAL, REACTIVE user object from the controller's list.
+    final Rx<UserModel> user = usersController.filteredUsers
+        .firstWhere((u) => u.id == initialUser.id, orElse: () => initialUser)
+        .obs;
 
     return Scaffold(
-      appBar: AppBar(title: Text(user.name)),
+      appBar: AppBar(title: Text(initialUser.name)),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
           Center(
-            child: Stack(
-              alignment: Alignment.bottomRight,
-              children: [
-                const CircleAvatar(radius: 60, child: Icon(Icons.person, size: 60)),
-                if (user.isSuspended)
-                  const CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Colors.red,
-                    child: Icon(Icons.block, color: Colors.white),
-                  ),
-              ],
+            // Wrap the Stack in an Obx to update the suspend icon in real-time
+            child: Obx(
+                  () => Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  const CircleAvatar(radius: 60, child: Icon(Icons.person, size: 60)),
+                  if (user.value.isSuspended)
+                    const CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.red,
+                      child: Icon(Icons.block, color: Colors.white),
+                    ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 20),
           _buildDetailCard(context, 'User Details', [
-            _buildDetailRow('Name', user.name),
-            _buildDetailRow('Email', user.email),
-            _buildDetailRow('Joined Date', DateFormat.yMMMd().format(user.joinedDate)),
+            _buildDetailRow('Name', initialUser.name),
+            _buildDetailRow('Email', initialUser.email),
+            _buildDetailRow('Joined Date', DateFormat.yMMMd().format(initialUser.joinedDate)),
           ]).animate().fadeIn(delay: 200.ms).slideX(),
           const SizedBox(height: 20),
           _buildDetailCard(context, 'Gamification Stats', [
-            _buildDetailRow('XP Points', user.xp.toString()),
-            _buildDetailRow('Current Streak', '${user.streak} days'),
+            _buildDetailRow('XP Points', initialUser.xp.toString()),
+            _buildDetailRow('Streak', '${initialUser.streak} days'),
           ]).animate().fadeIn(delay: 400.ms).slideX(),
           const SizedBox(height: 30),
           Text('Admin Actions', style: Theme.of(context).textTheme.headlineSmall)
               .animate().fadeIn(delay: 600.ms),
           const SizedBox(height: 16),
-          NeonButton(
-            text: user.isSuspended ? 'Unsuspend User' : 'Suspend User',
-            onTap: () {
-              Get.snackbar('Action Successful',
-                '${user.name} has been ${user.isSuspended ? "unsuspended" : "suspended"}.',
-                backgroundColor: isDark ? Colors.green : Colors.black,
-                colorText: Colors.white,
-              );
-            },
-            gradientColors: user.isSuspended
-                ? [Colors.green, Colors.teal]
-                : [Colors.orange, Colors.deepOrange],
-          ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.5),
-          const SizedBox(height: 16),
-          NeonButton(
-            text: 'Delete User',
-            onTap: () {
-              Get.defaultDialog(
-                  title: "Confirm Deletion",
-                  middleText: "Are you sure you want to delete ${user.name}?",
-                  textConfirm: "Delete",
-                  textCancel: "Cancel",
-                  confirmTextColor: Colors.white,
-                  onConfirm: () {
-                    Get.back();
-                    Get.back();
-                    Get.snackbar('Action Successful', '${user.name} has been deleted.');
-                  });
-            },
-            gradientColors: const [Colors.red, Colors.pinkAccent],
-          ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.5),
+          // Wrap the button in an Obx to update its text, color, and action in real-time
+          Obx(
+                () => NeonButton(
+              text: user.value.isSuspended ? 'Unsuspend User' : 'Suspend User',
+              onTap: () {
+                if (user.value.isSuspended) {
+                  usersController.unsuspendUser(user.value);
+                  Navigator.pop(context);
+                } else {
+                  usersController.suspendUser(user.value);
+                  Navigator.pop(context);
+                }
+              },
+              gradientColors: user.value.isSuspended
+                  ? [Colors.green, Colors.teal]
+                  : [Colors.orange, Colors.deepOrange],
+            ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.5),
+          ),
         ],
       ),
     );

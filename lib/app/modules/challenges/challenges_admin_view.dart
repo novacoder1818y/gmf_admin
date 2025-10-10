@@ -1,3 +1,5 @@
+// lib/modules/challenges/challenges_admin_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
@@ -10,7 +12,7 @@ class ChallengesAdminView extends GetView<ChallengesController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Challenge Management')),
+      // THE APPBAR HAS BEEN REMOVED FROM THIS PAGE
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Get.toNamed(Routes.ADD_CHALLENGE),
         label: const Text('Add Challenge'),

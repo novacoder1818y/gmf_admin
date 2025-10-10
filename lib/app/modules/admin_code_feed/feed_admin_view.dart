@@ -13,7 +13,7 @@ class FeedAdminView extends GetView<FeedAdminController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Code Feed Management')),
+      // appBar: AppBar(title: const Text('Code Feed Management')),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('codeFeed').orderBy('createdAt', descending: true).snapshots(),
         builder: (context, snapshot) {
