@@ -1,5 +1,6 @@
+// lib/modules/challenges/add_challenge_view.dart (ADMIN APP)
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../data/models/challenge_model.dart';
@@ -33,8 +34,6 @@ class _AddChallengeViewState extends State<AddChallengeView> {
     super.initState();
     isEditMode = existingChallenge != null;
     if (isEditMode) {
-      // Pre-populate the form fields with existing data.
-      // This now correctly accesses the fields from the new ChallengeModel.
       _titleController.text = existingChallenge!.title;
       _descriptionController.text = existingChallenge!.description;
       _pointsController.text = existingChallenge!.points.toString();
@@ -73,7 +72,17 @@ class _AddChallengeViewState extends State<AddChallengeView> {
       if (isEditMode) {
         await FirebaseFirestore.instance.collection('challenges').doc(existingChallenge!.id).update(data);
       } else {
-        await FirebaseFirestore.instance.collection('challenges').add(data);
+        final newChallenge = await FirebaseFirestore.instance.collection('challenges').add(data);
+
+        // --- THIS IS THE NEW LOGIC ---
+        // After creating the challenge, create a notification for it.
+        await FirebaseFirestore.instance.collection('notifications').add({
+          'title': '🚀 New Challenge Added!',
+          'body': 'Test your skills with the new "${_titleController.text}" challenge.',
+          'type': 'challenge', // To identify the notification type
+          'targetId': newChallenge.id, // The ID of the new challenge document
+          'createdAt': FieldValue.serverTimestamp(),
+        });
       }
       Get.back(); // Close dialog
       Get.back(); // Close form
@@ -123,7 +132,11 @@ class _AddChallengeViewState extends State<AddChallengeView> {
           Radio<String>(
             value: controller.text,
             groupValue: _correctAnswer,
-            onChanged: (value) => setState(() => _correctAnswer = controller.text),
+            onChanged: (value) {
+              if (controller.text.isNotEmpty) {
+                setState(() => _correctAnswer = controller.text);
+              }
+            },
           ),
         ],
       ),
@@ -133,6 +146,7 @@ class _AddChallengeViewState extends State<AddChallengeView> {
   TextFormField _buildTextFormField({required TextEditingController controller, required String label, required IconData icon, int maxLines = 1, TextInputType? keyboardType}) {
     return TextFormField(controller: controller, maxLines: maxLines, keyboardType: keyboardType, decoration: InputDecoration(labelText: label, prefixIcon: Icon(icon), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), filled: true), validator: (v) => v == null || v.isEmpty ? 'Cannot be empty' : null);
   }
+
   DropdownButtonFormField<String> _buildDropdown({required String label, String? value, required List<String> items, required ValueChanged<String?> onChanged}) {
     return DropdownButtonFormField<String>(value: value, decoration: InputDecoration(labelText: label, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), filled: true), items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(), onChanged: onChanged);
   }

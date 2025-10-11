@@ -10,33 +10,39 @@ class AdminDrawer extends GetView<AdminMainController> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(100),
+          bottomRight: Radius.circular(100),
+        ),
+      ),
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blueAccent,
-            ),
-            child: Text(
-              'Admin Panel',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+          Container(
+            height: 100,
+            decoration: BoxDecoration(color: Colors.cyan),
+            child: Center(
+              child: Text(
+                'Admin Panel',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
 
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Text('Content Management', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          const Divider(),
           _buildDrawerItem(icon: Icons.dashboard, title: 'Dashboard', index: 0),
           _buildDrawerItem(icon: Icons.article, title: 'Code Feed', index: 1),
           _buildDrawerItem(icon: Icons.gamepad, title: 'Challenges', index: 2),
           _buildDrawerItem(icon: Icons.event, title: 'Events', index: 3),
-          _buildDrawerItem(icon: Icons.fitness_center, title: 'Practice Arena', index: 5),
+          _buildDrawerItem(
+            icon: Icons.fitness_center,
+            title: 'Practice Arena',
+            index: 5,
+          ),
 
           _buildDrawerItem(icon: Icons.group, title: 'Users', index: 4),
           const Divider(),
@@ -52,7 +58,7 @@ class AdminDrawer extends GetView<AdminMainController> {
     required int index,
   }) {
     return Obx(
-          () => ListTile(
+      () => ListTile(
         leading: Icon(icon),
         title: Text(title),
         selected: controller.selectedIndex.value == index,
